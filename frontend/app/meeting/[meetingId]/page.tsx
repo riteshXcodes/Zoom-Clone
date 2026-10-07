@@ -182,6 +182,21 @@ function MeetingRoomContent() {
   const sentChatMessageIdsRef =
     useRef<Set<string>>(new Set());
 
+  useEffect(() => {
+    if (
+      !loading &&
+      videoRef.current &&
+      localStreamRef.current
+    ) {
+      videoRef.current.srcObject =
+        localStreamRef.current;
+
+      videoRef.current
+        .play()
+        .catch(() => {});
+    }
+  }, [loading]);
+
   /*
    * Load meeting.
    */
