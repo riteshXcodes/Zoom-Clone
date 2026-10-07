@@ -38,7 +38,7 @@ type Meeting = {
   created_at: string;
 };
 
-const API_URL = "http://127.0.0.1:8000";
+const API_URL = "https://zoom-clone-qd7w.onrender.com";
 
 const sidebarItems = [
   { label: "AI", icon: Sparkles, external: true, new: true },

@@ -11,7 +11,7 @@ import {
   Video,
 } from "lucide-react";
 
-const API_URL = "http://127.0.0.1:8000";
+const API_URL = "https://zoom-clone-qd7w.onrender.com";
 
 export default function SchedulePage() {
   const router = useRouter();

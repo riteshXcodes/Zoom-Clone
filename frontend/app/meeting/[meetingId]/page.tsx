@@ -30,8 +30,8 @@ import {
   Copy,
 } from "lucide-react";
 
-const API_URL = "http://127.0.0.1:8000";
-const WS_URL = "ws://127.0.0.1:8000";
+const API_URL = "https://zoom-clone-qd7w.onrender.com";
+const WS_URL = "wss://zoom-clone-qd7w.onrender.com";
 
 type Meeting = {
   id: number;
