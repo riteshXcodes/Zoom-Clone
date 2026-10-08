@@ -342,7 +342,7 @@ async def meeting_websocket(
             reason="Authentication required",
         )
         return
-
+    
     auth_state = await authenticate_websocket_token(token)
 
     if not auth_state:
@@ -356,7 +356,6 @@ async def meeting_websocket(
         websocket.query_params.get("name")
         or "Guest"
     )
-
 
     db = SessionLocal()
 
