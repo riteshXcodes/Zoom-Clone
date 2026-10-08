@@ -3,16 +3,9 @@ import { Suspense } from "react";
 
 export default function SignUpPage() {
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
+    <div className="auth-page">
       <Suspense fallback={<div>Loading...</div>}>
-        <SignUp />
+        <SignUp fallbackRedirectUrl="/home" />
       </Suspense>
     </div>
   );
