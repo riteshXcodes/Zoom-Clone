@@ -352,6 +352,12 @@ async def meeting_websocket(
         )
         return
 
+    display_name = (
+        websocket.query_params.get("name")
+        or "Guest"
+    )
+
+
     db = SessionLocal()
 
     try:

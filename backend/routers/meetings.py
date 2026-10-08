@@ -60,11 +60,7 @@ def create_meeting(
         user.id,
     )
 
-@router.post(
-    "/schedule",
-    response_model=MeetingResponse,
-    status_code=status.HTTP_201_CREATED,
-)
+
 @router.post(
     "/schedule",
     response_model=MeetingResponse,

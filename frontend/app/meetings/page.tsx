@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 import {
   ArrowLeft,
   CalendarDays,
@@ -27,6 +28,7 @@ const API_URL = "https://zoom-clone-qd7w.onrender.com";
 
 export default function MeetingsPage() {
   const router = useRouter();
+  const { getToken } = useAuth();
 
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [loading, setLoading] = useState(true);
@@ -38,9 +40,20 @@ export default function MeetingsPage() {
 
   async function loadMeetings() {
     try {
-      const response = await fetch(
-        `${API_URL}/api/meetings/recent`
-      );
+      const token = await getToken();
+
+if (!token) {
+  throw new Error("Authentication required.");
+}
+
+const response = await fetch(
+  `${API_URL}/api/meetings/recent`,
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
+);
 
       if (!response.ok) {
         throw new Error("Failed to load meetings.");
