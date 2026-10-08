@@ -1,95 +1,356 @@
-# Zoom Clone - Video Conferencing Platform
+# Zoom Clone — Full-Stack Video Conferencing Platform
 
-A full-stack video conferencing web application inspired by Zoom.  
-The application provides core meeting workflows including creating, joining, scheduling, and managing online meetings with real-time audio/video communication.
+A full-stack video conferencing platform inspired by Zoom, built for the SDE Fullstack Assignment.
 
----
+The project includes a public Zoom-style landing page, Clerk authentication, meeting creation and scheduling, SQLite persistence, real-time WebRTC audio/video, WebSocket signaling, participant management, chat, screen sharing, and host controls.
 
-## Features
-
-### Core Features
-
-#### 1. Landing Dashboard
-
-- Zoom-inspired dashboard interface
-- New Meeting
-- Join Meeting
-- Schedule Meeting
-- Upcoming Meetings section
-- Recent Meetings section
-- Default logged-in user
-
-#### 2. Instant Meeting Creation
-
-- Create a meeting instantly
-- Automatically generate a unique Meeting ID
-- Automatically generate a shareable meeting link
-- Redirect directly to the meeting room after creation
-
-#### 3. Join Meeting
-
-- Join using Meeting ID
-- Join using meeting link
-- Enter display name before joining
-- Validate meeting existence before joining
-
-#### 4. Schedule Meetings
-
-- Create scheduled meetings
-- Meeting title
-- Meeting description
-- Date and time picker
-- Meeting duration
-- Automatically generated meeting link
-- Store scheduled meetings in the database
-- Display scheduled meetings in Upcoming Meetings
-
-#### 5. Meeting Room
-
-- Real-time video communication
-- Real-time audio communication
-- Multiple participants
-- Camera on/off
-- Microphone on/off
-- Screen sharing
-- Participant list
-- Real-time chat
-- Meeting information
-- Leave meeting functionality
+**Live App:** https://zoom-clone-red-alpha.vercel.app/  
+**GitHub:** https://github.com/riteshXcodes/Zoom-Clone
 
 ---
 
-## Bonus Features
+## ✨ Highlights
+
+- 🎨 Zoom-inspired public landing page
+- 🔐 Clerk authentication
+- ⚡ Instant meeting creation
+- 🔗 Unique Meeting ID + shareable invite link
+- 👤 Display-name based joining
+- 📅 Meeting scheduling
+- 🗄️ SQLite + SQLAlchemy database
+- 🎥 Real-time WebRTC audio/video
+- 🖥️ Screen sharing
+- 💬 Real-time meeting chat
+- 👥 Participant list and live participant state
+- 🛡️ Host controls
+- 📱 Responsive UI
+- 🌐 Deployed frontend and backend
+
+---
+
+# 📸 Screenshots
+
+> Project screenshots can be added to `docs/screenshots/` and referenced here.  
+> The recommended screenshot set is listed below so the README documents the important user flows rather than only the homepage.
+
+### Public Landing Page
+
+![Landing Page](docs/screenshots/landing-page.png)
+
+### Authentication
+
+![Sign In](docs/screenshots/sign-in.png)
+
+### Dashboard
+
+![Dashboard](docs/screenshots/dashboard.png)
+
+### Schedule Meeting
+
+![Schedule Meeting](docs/screenshots/schedule-meeting.png)
+
+### Join Meeting
+
+![Join Meeting](docs/screenshots/join-meeting.png)
+
+### Meetings / Recent Meetings
+
+![Meetings](docs/screenshots/meetings.png)
+
+### Meeting Room
+
+![Meeting Room](docs/screenshots/meeting-room.png)
 
 ### Host Controls
+
+![Host Controls](docs/screenshots/host-controls.png)
+
+> **Screenshot checklist:** Landing Page → Sign In → Dashboard → Schedule → Join → Meetings → Meeting Room → Host Controls.
+
+---
+
+# 🧩 Application Pages
+
+| Route | Purpose |
+|---|---|
+| `/` | Public Zoom-inspired landing page |
+| `/sign-in` | Clerk sign-in |
+| `/sign-up` | Clerk sign-up |
+| `/home` | Authenticated dashboard |
+| `/join` | Join a meeting using Meeting ID |
+| `/schedule` | Schedule a new meeting |
+| `/meetings` | View meeting history / recent meetings |
+| `/meeting/[meetingId]` | Real-time meeting room |
+
+---
+
+# 🚀 Core Features
+
+## 1. Public Landing Page
+
+The root route is a public Zoom-inspired marketing/landing page rather than opening directly on authentication.
+
+It includes:
+
+- Zoom-style navigation bar
+- Products / AI / Solutions / Pricing navigation
+- Sign In and Sign Up CTAs
+- Hero section
+- Product showcase
+- AI / My Notes section
+- Collaboration section
+- Trusted-by section
+- Customer stories
+- News / updates section
+- Final call-to-action
+- Footer
+- Responsive mobile layout
+
+Authentication is entered through the **Sign In** or **Sign Up Free** actions.
+
+---
+
+## 2. Authentication
+
+Authentication is implemented using **Clerk**.
+
+- Sign in
+- Sign up
+- Protected application routes
+- Authenticated API requests
+- Clerk user identity mapped to backend users
+- Public landing page remains accessible without authentication
+
+---
+
+## 3. Instant Meeting
+
+Users can create a meeting instantly.
+
+Flow:
+
+```text
+Dashboard
+   ↓
+New Meeting
+   ↓
+Backend generates unique Meeting ID
+   ↓
+Meeting record stored in SQLite
+   ↓
+Invite link generated
+   ↓
+Redirect to Meeting Room
+```
+
+Each meeting receives a unique numeric Meeting ID.
+
+---
+
+## 4. Join Meeting
+
+Users can join an existing meeting by:
+
+- Meeting ID
+- Meeting invite URL
+
+Before joining, the user provides a display name.
+
+The backend validates that the meeting exists before the participant enters the meeting room.
+
+---
+
+## 5. Schedule Meeting
+
+The scheduling page supports:
+
+- Meeting title
+- Description
+- Date
+- Time
+- Duration
+
+After scheduling:
+
+- A unique Meeting ID is generated
+- An invite link is generated
+- The meeting is stored in SQLite
+- The meeting appears in upcoming meetings
+
+---
+
+## 6. Meeting Room
+
+The meeting room provides:
+
+- Real-time video
+- Real-time audio
+- Multiple participants
+- Camera toggle
+- Microphone toggle
+- Screen sharing
+- Participant list
+- Meeting information
+- Copy invite link
+- Real-time chat
+- Leave meeting
+
+The media layer is powered by WebRTC.
+
+---
+
+## 7. Host Controls
 
 The application includes host-management functionality:
 
 - Host identification
 - Host badge
-- Mute individual participants
-- Remove participants
-- Automatic host transfer when the current host leaves
-
-### Responsive Design
-
-The interface is designed to provide a clean experience across different screen sizes, including:
-
-- Desktop
-- Tablet
-- Mobile
-
-### Real-Time Participant Management
-
-- Participant join notifications
-- Participant leave handling
-- Real-time microphone state
-- Real-time camera state
+- Mute individual participant
+- Remove participant
+- Host transfer
 - Host state synchronization
+
+When the current host leaves, host responsibility can be transferred to another participant.
 
 ---
 
-# Tech Stack
+# 🗃️ Database Design
+
+The project uses **SQLite** with **SQLAlchemy ORM**.
+
+The current schema contains three main entities:
+
+```text
+┌──────────────┐
+│     User     │
+└──────┬───────┘
+       │
+       │ 1 : N
+       ▼
+┌──────────────┐
+│   Meeting    │
+└──────┬───────┘
+       │
+       │ 1 : N
+       ▼
+┌──────────────┐
+│ Participant  │
+└──────────────┘
+```
+
+## User
+
+Stores application user information.
+
+| Field | Type | Description |
+|---|---|---|
+| `id` | Integer | Primary key |
+| `clerk_user_id` | String | Clerk user identifier |
+| `name` | String | User name |
+| `email` | String | User email |
+| `avatar` | String | Avatar/initial |
+| `created_at` | DateTime | Account creation timestamp |
+
+## Meeting
+
+Stores meeting information.
+
+| Field | Type | Description |
+|---|---|---|
+| `id` | Integer | Primary key |
+| `meeting_id` | String | Public unique Meeting ID |
+| `title` | String | Meeting title |
+| `description` | Text | Meeting description |
+| `host_id` | Integer | Foreign key to User |
+| `scheduled_at` | DateTime | Scheduled date/time; nullable for instant meetings |
+| `duration` | Integer | Duration in minutes |
+| `invite_link` | String | Shareable meeting path |
+| `status` | String | Meeting status such as `scheduled` or `instant` |
+| `created_at` | DateTime | Creation timestamp |
+
+## Participant
+
+Stores participants who join meetings.
+
+| Field | Type | Description |
+|---|---|---|
+| `id` | Integer | Primary key |
+| `meeting_id` | Integer | Foreign key to Meeting |
+| `display_name` | String | Name displayed inside the meeting |
+| `joined_at` | DateTime | Time the participant joined |
+| `left_at` | DateTime | Time the participant left; nullable |
+
+### Relationships
+
+- One **User** can host multiple **Meetings**.
+- One **Meeting** belongs to one host.
+- One **Meeting** can have multiple **Participants**.
+- Each **Participant** belongs to one meeting.
+- Participant presence is tracked using `joined_at` and `left_at`.
+- Clerk identity is stored on the User record using `clerk_user_id`.
+
+---
+
+# 🏗️ Architecture
+
+```text
+                    ┌─────────────────────┐
+                    │    Next.js Frontend │
+                    │  React + TypeScript │
+                    └──────────┬──────────┘
+                               │
+                 ┌─────────────┴─────────────┐
+                 │                           │
+             REST API                    WebSocket
+                 │                           │
+                 ▼                           ▼
+        ┌─────────────────────────────────────────┐
+        │              FastAPI Backend            │
+        │         Authentication + Signaling      │
+        └──────────────────┬──────────────────────┘
+                           │
+                           ▼
+                    ┌─────────────┐
+                    │   SQLite    │
+                    │ SQLAlchemy  │
+                    └─────────────┘
+
+              WebRTC
+      Browser ↔ Browser
+       Audio / Video
+       Screen Sharing
+```
+
+### Communication responsibilities
+
+**REST API**
+
+- Create meetings
+- Schedule meetings
+- Validate meetings
+- Join meetings
+- Fetch upcoming meetings
+- Fetch recent meetings
+
+**WebSockets**
+
+- WebRTC signaling
+- Participant join/leave events
+- Chat
+- Camera state
+- Microphone state
+- Host controls
+- Host transfer
+
+**WebRTC**
+
+- Peer-to-peer audio
+- Peer-to-peer video
+- Screen sharing
+
+---
+
+# 🛠️ Tech Stack
 
 ## Frontend
 
@@ -98,14 +359,15 @@ The interface is designed to provide a clean experience across different screen 
 - TypeScript
 - CSS
 - Lucide React
+- Clerk
 
 ## Backend
 
 - Python
 - FastAPI
 - SQLAlchemy
-- WebSockets
 - Uvicorn
+- WebSockets
 
 ## Database
 
@@ -117,92 +379,43 @@ The interface is designed to provide a clean experience across different screen 
 - WebRTC
 - WebSockets
 
----
+## Deployment
 
-# Database Design
-
-The application uses **SQLite** with **SQLAlchemy ORM**.
-
-The database is designed around three main entities:
-
-```text
-User
-  |
-  | 1
-  |
-  | N
-Meeting
-  |
-  | 1
-  |
-  | N
-Participant
-```
-
-## User
-
-Stores information about application users.
-
-| Field | Description |
-|---|---|
-| id | Unique user identifier |
-| name | User display name |
-
-## Meeting
-
-Stores information about meetings.
-
-| Field | Description |
-|---|---|
-| id | Unique database identifier |
-| meeting_id | Unique meeting identifier |
-| title | Meeting title |
-| description | Meeting description |
-| scheduled_at | Scheduled date and time |
-| duration | Meeting duration |
-| host_id | User who created/hosts the meeting |
-
-## Participant
-
-Stores participants associated with meetings.
-
-| Field | Description |
-|---|---|
-| id | Unique participant identifier |
-| meeting_id | Associated meeting |
-| user_id | Associated user |
-| is_host | Indicates whether the participant is the host |
-
-### Relationships
-
-- One **User** can create multiple meetings.
-- One **Meeting** can have multiple participants.
-- A **Participant** belongs to a specific meeting.
-- A meeting has one host at a time.
-- Host responsibility can be transferred when the current host leaves.
+- Vercel — Frontend
+- Render — Backend
 
 ---
 
-# Project Structure
+# 📁 Project Structure
 
 ```text
 zoom-clone/
 │
 ├── backend/
 │   ├── routers/
-│   ├── venv/
+│   │   └── meetings.py
+│   ├── auth.py
 │   ├── crud.py
 │   ├── database.py
 │   ├── main.py
 │   ├── models.py
-│   └── schemas.py
+│   ├── schemas.py
+│   └── requirements.txt
 │
 ├── frontend/
 │   ├── app/
+│   │   ├── home/
+│   │   ├── join/
+│   │   ├── meeting/
+│   │   ├── meetings/
+│   │   ├── schedule/
+│   │   ├── sign-in/
+│   │   ├── sign-up/
+│   │   ├── page.tsx
+│   │   ├── layout.tsx
+│   │   └── globals.css
 │   ├── public/
 │   ├── package.json
-│   ├── package-lock.json
-│   ├── next.config.ts
 │   └── tsconfig.json
 │
 └── README.md
@@ -210,17 +423,19 @@ zoom-clone/
 
 ---
 
-# Requirements
+# ⚙️ Local Setup
 
-Before running the project, make sure the following are installed:
+## Requirements
+
+Install:
 
 - Node.js
 - npm
 - Python 3.x
 - Git
-- Modern web browser such as Chrome, Edge, or Firefox
+- Modern browser
 
-Check the installed versions:
+Check versions:
 
 ```bash
 node --version
@@ -229,34 +444,19 @@ python --version
 git --version
 ```
 
----
-
-# Setup Instructions
-
-## 1. Clone the Repository
+## 1. Clone
 
 ```bash
-git clone <YOUR_GITHUB_REPOSITORY_URL>
-cd zoom-clone
+git clone https://github.com/riteshXcodes/Zoom-Clone.git
+cd Zoom-Clone
 ```
 
----
-
-# Backend Setup
-
-Open a terminal and navigate to the backend:
+## 2. Backend
 
 ```bash
 cd backend
-```
-
-### Create Virtual Environment
-
-```bash
 python -m venv venv
 ```
-
-### Activate Virtual Environment
 
 Windows:
 
@@ -264,84 +464,43 @@ Windows:
 venv\Scripts\activate
 ```
 
-### Install Dependencies
+Install:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### Start Backend
+Configure the required environment variables, including the Clerk secret key.
+
+Start:
 
 ```bash
 uvicorn main:app --reload
 ```
 
-The backend will run at:
+Backend:
 
 ```text
 http://127.0.0.1:8000
 ```
 
-FastAPI documentation:
+FastAPI docs:
 
 ```text
 http://127.0.0.1:8000/docs
 ```
 
----
+## 3. Frontend
 
-# Frontend Setup
-
-Open a **new terminal** while keeping the backend running.
-
-Navigate to the frontend:
+Open another terminal:
 
 ```bash
 cd frontend
-```
-
-Install dependencies:
-
-```bash
 npm install
-```
-
-Start the development server:
-
-```bash
 npm run dev
 ```
 
-The frontend will run at:
-
-```text
-http://localhost:3000
-```
-
-Open this URL in your browser.
-
----
-
-# Running the Application
-
-Two terminals are required.
-
-### Terminal 1 - Backend
-
-```bash
-cd backend
-venv\Scripts\activate
-uvicorn main:app --reload
-```
-
-### Terminal 2 - Frontend
-
-```bash
-cd frontend
-npm run dev
-```
-
-Then open:
+Frontend:
 
 ```text
 http://localhost:3000
@@ -349,200 +508,116 @@ http://localhost:3000
 
 ---
 
-# Production Build
-
-To create a production build of the frontend:
-
-```bash
-cd frontend
-npm run build
-```
-
-To start the production frontend:
-
-```bash
-npm start
-```
-
----
-
-# Meeting Workflow
-
-The application follows this workflow:
+# 🔄 Main User Flow
 
 ```text
-                    Dashboard
-                        |
-          +-------------+-------------+
-          |             |             |
-          v             v             v
-     New Meeting    Join Meeting   Schedule
-          |             |          Meeting
-          |             |             |
-          v             v             v
-          +-------------+-------------+
-                        |
-                        v
-                  Meeting Room
-                        |
-       +----------------+----------------+
-       |                |                |
-       v                v                v
-     Audio            Video          Screen Share
-       |                |                |
-       +----------------+----------------+
-                        |
-                        v
-                 Participants
-                        |
-                 +------+------+
-                 |             |
-               Chat      Host Controls
+                    Public Landing Page
+                            │
+                  ┌─────────┴─────────┐
+                  │                   │
+               Sign In             Sign Up
+                  │                   │
+                  └─────────┬─────────┘
+                            ▼
+                        Dashboard
+                            │
+          ┌─────────────────┼─────────────────┐
+          │                 │                 │
+          ▼                 ▼                 ▼
+     New Meeting       Join Meeting       Schedule
+          │                 │              Meeting
+          └─────────────────┼─────────────────┘
+                            ▼
+                      Meeting Room
+                            │
+        ┌───────────┬───────┼────────┬───────────┐
+        ▼           ▼       ▼        ▼           ▼
+      Video       Audio   Chat    Screen     Participants
+                                   Share
 ```
 
 ---
 
-# Real-Time Communication
+# 🧪 Testing Checklist
 
-The application uses:
+The following flows are supported/tested during development:
 
-### WebRTC
-
-WebRTC is used for:
-
-- Audio communication
-- Video communication
-- Screen sharing
-- Receiving remote participant streams
-
-### WebSockets
-
-WebSockets are used for:
-
-- WebRTC signaling
-- Participant join/leave events
-- Chat messages
-- Camera state synchronization
-- Microphone state synchronization
-- Host controls
-- Host transfer
-
----
-
-# Host Management
-
-The first participant entering a meeting becomes the host.
-
-The host can:
-
-- See which participants are present
-- Mute participants
-- Remove participants
-- Manage the meeting
-
-If the current host leaves while other participants remain, host responsibility is transferred to another participant.
-
----
-
-# Assumptions
-
-- A default user is assumed to be logged in.
-- Authentication is not required for the core functionality.
-- SQLite is used as the database as specified in the assignment.
-- Camera and microphone permissions are required for audio/video functionality.
-- WebRTC is used for real-time media communication.
-- WebSockets are used for real-time signaling and meeting events.
-- The application is designed primarily for modern browsers.
-- Advanced Zoom features outside the assignment scope are not implemented.
-
----
-
-# Testing
-
-The following functionality has been tested:
-
-- Dashboard
+- Public landing page
+- Sign in / sign up
+- Protected dashboard
 - Instant meeting creation
-- Meeting ID generation
-- Meeting link generation
-- Join meeting
+- Unique Meeting ID generation
+- Invite link generation
 - Meeting validation
 - Display name
 - Meeting scheduling
 - Upcoming meetings
-- Audio/video communication
+- Recent meetings
+- Audio/video
 - Multiple participants
-- Microphone controls
-- Camera controls
+- Microphone control
+- Camera control
 - Screen sharing
 - Participant list
 - Chat
 - Host identification
-- Host mute
+- Participant mute
 - Participant removal
 - Host transfer
-- Leaving a meeting
-- Backend startup
-- Frontend production build
+- Leave meeting
 
 ---
 
-# Assignment Requirements Coverage
+# 📋 Assignment Coverage
 
-| Assignment Requirement | Status |
+| Requirement | Status |
 |---|---|
-| Landing Dashboard | Implemented |
-| New Meeting | Implemented |
-| Join Meeting | Implemented |
-| Schedule Meeting | Implemented |
-| Upcoming Meetings | Implemented |
-| Recent Meetings | Implemented |
-| Unique Meeting ID | Implemented |
-| Shareable Invite Link | Implemented |
-| Join using Meeting ID | Implemented |
-| Join using Invite Link | Implemented |
-| Display Name | Implemented |
-| Meeting Validation | Implemented |
-| Title / Description | Implemented |
-| Date & Time | Implemented |
-| Duration | Implemented |
-| Database Storage | Implemented |
-| Audio / Video | Implemented |
-| Participant Management | Implemented |
+| Public landing page | ✅ |
+| Authentication | ✅ Bonus |
+| Dashboard | ✅ |
+| New / Instant Meeting | ✅ |
+| Unique Meeting ID | ✅ |
+| Shareable Invite Link | ✅ |
+| Join by Meeting ID | ✅ |
+| Meeting validation | ✅ |
+| Display Name | ✅ |
+| Schedule Meeting | ✅ |
+| Title / Description | ✅ |
+| Date / Time | ✅ |
+| Duration | ✅ |
+| SQLite database | ✅ |
+| Upcoming Meetings | ✅ |
+| Recent Meetings | ✅ |
+| Audio / Video | ✅ |
+| Multiple Participants | ✅ |
+| Screen Sharing | ✅ |
+| Chat | ✅ |
+| Responsive UI | ✅ Bonus |
+| Host Controls | ✅ Bonus |
 
 ---
 
-# Bonus Features
+# 🎯 Design Philosophy
 
-| Bonus Feature | Status |
-|---|---|
-| Responsive Design | Implemented |
-| Host Controls | Implemented |
-| Mute Participant | Implemented |
-| Remove Participant | Implemented |
-| Host Transfer | Implemented |
+The application intentionally follows the visual language of modern Zoom:
 
----
-
-# Design Approach
-
-The UI follows a Zoom-inspired design approach with:
-
-- Dark meeting interface
-- Video grid
+- Clean white marketing pages
+- Zoom blue primary actions
+- Dark meeting-room interface
+- Large video tiles
 - Bottom meeting controls
-- Participant sidebar
-- Chat sidebar
-- Meeting information panel
-- Host indicators
-- Clean dashboard
-- Meeting scheduling interface
-- Responsive layout
+- Participant side panel
+- Clear meeting information
+- Responsive layouts
+- Simple meeting workflows
+
+The implementation is an independent project inspired by Zoom's product experience and is not affiliated with Zoom Video Communications.
 
 ---
 
-# Author
+# 👨‍💻 Author
 
-Developed as part of the SDE Fullstack Assignment.
+**Ritesh Anand**
 
----
+SDE Fullstack Assignment — Zoom Clone
+
