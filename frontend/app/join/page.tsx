@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 import {
   ArrowLeft,
   Link as LinkIcon,
@@ -13,7 +14,7 @@ const API_URL = "https://zoom-clone-qd7w.onrender.com";
 
 export default function JoinPage() {
   const router = useRouter();
-
+  const { getToken } = useAuth();
   const [meetingId, setMeetingId] = useState("");
   const [displayName, setDisplayName] = useState("Ritesh Anand");
   const [joining, setJoining] = useState(false);
@@ -42,13 +43,31 @@ export default function JoinPage() {
 
     setJoining(true);
 
-    try {
+       try {
+      const token = await getToken();
+
+      if (!token) {
+        setError("Authentication required. Please sign in.");
+        return;
+      }
+
       const meetingResponse = await fetch(
-        `${API_URL}/api/meetings/${cleanedMeetingId}`
+        `${API_URL}/api/meetings/${cleanedMeetingId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
 
       if (!meetingResponse.ok) {
-        setError("Meeting not found. Please check the meeting ID.");
+        const data = await meetingResponse.json().catch(() => null);
+
+        setError(
+          data?.detail ||
+            "Meeting not found. Please check the meeting ID."
+        );
+
         return;
       }
 
@@ -60,6 +79,7 @@ export default function JoinPage() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
             display_name: displayName.trim(),
