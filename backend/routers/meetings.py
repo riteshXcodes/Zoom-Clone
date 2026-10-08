@@ -27,7 +27,7 @@ router = APIRouter(
     tags=["Meetings"],
 )
 
-
+    
 @router.post(
     "",
     response_model=MeetingResponse,
@@ -46,32 +46,12 @@ def create_meeting(
             detail="Invalid Clerk user",
         )
 
-    clerk_user = current_user.user
-
-    email = (
-        clerk_user.email_addresses[0].email_address
-        if clerk_user.email_addresses
-        else f"{clerk_user_id}@clerk.local"
-    )
-
-    name = (
-        clerk_user.first_name
-        or clerk_user.username
-        or email.split("@")[0]
-    )
-
-    avatar = (
-        name[0].upper()
-        if name
-        else "U"
-    )
-
     user = get_or_create_user(
         db=db,
         clerk_user_id=clerk_user_id,
-        name=name,
-        email=email,
-        avatar=avatar,
+        name=f"User {clerk_user_id[:8]}",
+        email=f"{clerk_user_id}@clerk.local",
+        avatar="U",
     )
 
     return create_instant_meeting(
@@ -79,7 +59,6 @@ def create_meeting(
         data.title,
         user.id,
     )
-
 
 @router.post(
     "/schedule",
@@ -104,19 +83,8 @@ def schedule_meeting(
             detail="Invalid Clerk user",
         )
 
-    clerk_user = current_user.user
-
-    email = (
-        clerk_user.email_addresses[0].email_address
-        if clerk_user.email_addresses
-        else f"{clerk_user_id}@clerk.local"
-    )
-
-    name = (
-        clerk_user.first_name
-        or clerk_user.username
-        or email.split("@")[0]
-    )
+    email = f"{clerk_user_id}@clerk.local"
+    name = f"User {clerk_user_id[:8]}"
 
     avatar = (
         name[0].upper()
@@ -129,7 +97,7 @@ def schedule_meeting(
         clerk_user_id=clerk_user_id,
         name=name,
         email=email,
-        avatar=avatar,
+        avatar="U",
     )
 
     return create_scheduled_meeting(
