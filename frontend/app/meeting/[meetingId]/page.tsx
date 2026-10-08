@@ -7,6 +7,8 @@ import {
   useState,
 } from "react";
 
+import { useAuth } from "@clerk/nextjs";
+
 import {
   useParams,
   useRouter,
@@ -71,6 +73,8 @@ function MeetingRoomContent() {
   const params = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  const { getToken } = useAuth();
 
   const meetingId = String(
     params.meetingId
@@ -236,8 +240,20 @@ function MeetingRoomContent() {
       setLoading(true);
       setError("");
 
+      const token = await getToken();
+
+      if (!token) {
+        setError("Authentication required.");
+        return;
+      }
+
       const response = await fetch(
-        `${API_URL}/api/meetings/${meetingId}`
+        `${API_URL}/api/meetings/${meetingId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
 
       if (!isActive()) {
@@ -278,7 +294,9 @@ function MeetingRoomContent() {
         );
       }
     } finally {
-      setLoading(false);
+      if (isActive()) {
+        setLoading(false);
+      }
     }
   }
 
@@ -355,12 +373,24 @@ function MeetingRoomContent() {
    * WebSocket signaling.
    */
 
-  function connectWebSocket(
-    sessionId: number
-  ) {
+  async function connectWebSocket(
+  sessionId: number
+) {
+  try {
+    const token = await getToken();
+
+    if (!token) {
+      setError(
+        "Authentication required."
+      );
+      return;
+    }
+
     const socketUrl =
       `${WS_URL}/ws/meeting/` +
-      `${meetingId}?name=` +
+      `${meetingId}?token=` +
+      encodeURIComponent(token) +
+      `&name=` +
       encodeURIComponent(
         displayName
       );
@@ -440,7 +470,17 @@ function MeetingRoomContent() {
         );
       }
     };
+  } catch (error) {
+    console.error(
+      "WebSocket authentication error:",
+      error
+    );
+
+    setError(
+      "Unable to authenticate with the meeting."
+    );
   }
+}
 
   /*
    * Signaling message handler.

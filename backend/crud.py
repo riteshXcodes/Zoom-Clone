@@ -6,19 +6,34 @@ from sqlalchemy.orm import Session
 from models import Meeting, Participant, User
 
 
-def get_default_user(db: Session):
-    user = db.query(User).filter(User.id == 1).first()
-
-    if not user:
-        user = User(
-            id=1,
-            name="Ritesh Anand",
-            email="ritesh@example.com",
-            avatar="R",
+def get_or_create_user(
+    db: Session,
+    clerk_user_id: str,
+    name: str,
+    email: str,
+    avatar: str = "U",
+):
+    user = (
+        db.query(User)
+        .filter(
+            User.clerk_user_id == clerk_user_id
         )
-        db.add(user)
-        db.commit()
-        db.refresh(user)
+        .first()
+    )
+
+    if user:
+        return user
+
+    user = User(
+        clerk_user_id=clerk_user_id,
+        name=name,
+        email=email,
+        avatar=avatar,
+    )
+
+    db.add(user)
+    db.commit()
+    db.refresh(user)
 
     return user
 
@@ -42,8 +57,9 @@ def generate_meeting_id(db: Session) -> str:
 def create_instant_meeting(
     db: Session,
     title: str,
+    user_id: int,
 ):
-    user = get_default_user(db)
+    
 
     meeting_id = generate_meeting_id(db)
 
@@ -51,7 +67,7 @@ def create_instant_meeting(
         meeting_id=meeting_id,
         title=title,
         description="Instant meeting",
-        host_id=user.id,
+        host_id=user_id,
         scheduled_at=None,
         duration=60,
         invite_link=f"/meeting/{meeting_id}",
@@ -64,23 +80,21 @@ def create_instant_meeting(
 
     return meeting
 
-
 def create_scheduled_meeting(
     db: Session,
     title: str,
     description: str | None,
     scheduled_at: datetime,
     duration: int,
+    user_id: int,
 ):
-    user = get_default_user(db)
-
     meeting_id = generate_meeting_id(db)
 
     meeting = Meeting(
         meeting_id=meeting_id,
         title=title,
         description=description,
-        host_id=user.id,
+        host_id=user_id,
         scheduled_at=scheduled_at,
         duration=duration,
         invite_link=f"/meeting/{meeting_id}",

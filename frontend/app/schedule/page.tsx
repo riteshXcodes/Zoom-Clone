@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState, useEffect } from "react";
+import { useApi } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
@@ -11,9 +12,13 @@ import {
   Video,
 } from "lucide-react";
 
+
+
 const API_URL = "https://zoom-clone-qd7w.onrender.com";
 
 export default function SchedulePage() {
+
+  const { apiFetch } = useApi();
   const router = useRouter();
 
   const [title, setTitle] = useState("");
@@ -51,7 +56,7 @@ export default function SchedulePage() {
     try {
       const scheduledAt = `${date}T${time}:00`;
 
-      const response = await fetch(
+      const response = await apiFetch(
         `${API_URL}/api/meetings/schedule`,
         {
           method: "POST",

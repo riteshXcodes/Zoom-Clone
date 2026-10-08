@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { UserButton, useUser } from "@clerk/nextjs";
+import { useApi } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import {
   Search,
@@ -57,6 +59,8 @@ const sidebarItems = [
 
 export default function Home() {
   const router = useRouter();
+  const { user } = useUser();
+  const { apiFetch } = useApi();
 
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [loadingMeetings, setLoadingMeetings] = useState(true);
@@ -69,9 +73,9 @@ export default function Home() {
 
   async function fetchUpcomingMeetings() {
     try {
-      const response = await fetch(
-        `${API_URL}/api/meetings/upcoming`
-      );
+      const response = await apiFetch(
+  `${API_URL}/api/meetings/upcoming`
+);
 
       if (!response.ok) {
         throw new Error("Failed to fetch meetings");
@@ -92,10 +96,10 @@ export default function Home() {
     setCreatingMeeting(true);
 
     try {
-      const response = await fetch(
-        `${API_URL}/api/meetings`,
-        {
-          method: "POST",
+      const response = await apiFetch(
+  `${API_URL}/api/meetings`,
+  {
+    method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
@@ -225,9 +229,7 @@ export default function Home() {
             <ChevronDown size={16} />
           </button>
 
-          <button className="profile-avatar-small">
-            R
-          </button>
+          <UserButton />
         </nav>
       </header>
 
@@ -297,11 +299,18 @@ export default function Home() {
                 <div className="profile-info">
 
                   <div className="large-avatar">
-                    R
-                  </div>
+  {(user?.firstName?.charAt(0) ||
+    user?.emailAddresses[0]?.emailAddress.charAt(0) ||
+    "U"
+  ).toUpperCase()}
+</div>
 
                   <div>
-                    <h1>Ritesh anand</h1>
+                    <h1>
+  {user?.firstName ||
+    user?.emailAddresses[0]?.emailAddress ||
+    "User"}
+</h1>
 
                     <p>
                       Plan:{" "}

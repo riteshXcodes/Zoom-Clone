@@ -1,4 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+
+from auth import get_current_user
 from sqlalchemy.orm import Session
 
 from crud import (
@@ -8,7 +10,9 @@ from crud import (
     get_recent_meetings,
     get_upcoming_meetings,
     join_meeting,
+    get_or_create_user,
 )
+
 from database import get_db
 from schemas import (
     MeetingCreate,
@@ -32,10 +36,48 @@ router = APIRouter(
 def create_meeting(
     data: MeetingCreate,
     db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
 ):
+    clerk_user_id = current_user.payload.get("sub")
+
+    if not clerk_user_id:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid Clerk user",
+        )
+
+    clerk_user = current_user.user
+
+    email = (
+        clerk_user.email_addresses[0].email_address
+        if clerk_user.email_addresses
+        else f"{clerk_user_id}@clerk.local"
+    )
+
+    name = (
+        clerk_user.first_name
+        or clerk_user.username
+        or email.split("@")[0]
+    )
+
+    avatar = (
+        name[0].upper()
+        if name
+        else "U"
+    )
+
+    user = get_or_create_user(
+        db=db,
+        clerk_user_id=clerk_user_id,
+        name=name,
+        email=email,
+        avatar=avatar,
+    )
+
     return create_instant_meeting(
         db,
         data.title,
+        user.id,
     )
 
 
@@ -44,16 +86,59 @@ def create_meeting(
     response_model=MeetingResponse,
     status_code=status.HTTP_201_CREATED,
 )
+@router.post(
+    "/schedule",
+    response_model=MeetingResponse,
+    status_code=status.HTTP_201_CREATED,
+)
 def schedule_meeting(
     data: ScheduledMeetingCreate,
     db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
 ):
+    clerk_user_id = current_user.payload.get("sub")
+
+    if not clerk_user_id:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid Clerk user",
+        )
+
+    clerk_user = current_user.user
+
+    email = (
+        clerk_user.email_addresses[0].email_address
+        if clerk_user.email_addresses
+        else f"{clerk_user_id}@clerk.local"
+    )
+
+    name = (
+        clerk_user.first_name
+        or clerk_user.username
+        or email.split("@")[0]
+    )
+
+    avatar = (
+        name[0].upper()
+        if name
+        else "U"
+    )
+
+    user = get_or_create_user(
+        db=db,
+        clerk_user_id=clerk_user_id,
+        name=name,
+        email=email,
+        avatar=avatar,
+    )
+
     return create_scheduled_meeting(
         db=db,
         title=data.title,
         description=data.description,
         scheduled_at=data.scheduled_at,
         duration=data.duration,
+        user_id=user.id,
     )
 
 
@@ -63,6 +148,7 @@ def schedule_meeting(
 )
 def upcoming_meetings(
     db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
 ):
     return get_upcoming_meetings(db)
 
@@ -73,6 +159,7 @@ def upcoming_meetings(
 )
 def recent_meetings(
     db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
 ):
     return get_recent_meetings(db)
 
@@ -84,6 +171,7 @@ def recent_meetings(
 def get_single_meeting(
     meeting_id: str,
     db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
 ):
     meeting = get_meeting(
         db,
@@ -107,6 +195,7 @@ def join_existing_meeting(
     meeting_id: str,
     data: ParticipantJoin,
     db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
 ):
     meeting = get_meeting(
         db,

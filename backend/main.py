@@ -1,3 +1,7 @@
+from dotenv import load_dotenv
+
+load_dotenv()
+
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -8,6 +12,10 @@ from database import Base, SessionLocal, engine
 from models import Meeting, User
 from routers.meetings import router as meetings_router
 
+from auth import (
+    get_current_user,
+    authenticate_websocket_token,
+)
 
 class MeetingConnectionManager:
     def __init__(self):
@@ -326,12 +334,23 @@ async def meeting_websocket(
     websocket: WebSocket,
     meeting_id: str,
 ):
-    display_name = (
-        websocket.query_params.get(
-            "name"
+    token = websocket.query_params.get("token")
+
+    if not token:
+        await websocket.close(
+            code=1008,
+            reason="Authentication required",
         )
-        or "Guest"
-    )
+        return
+
+    auth_state = await authenticate_websocket_token(token)
+
+    if not auth_state:
+        await websocket.close(
+            code=1008,
+            reason="Invalid authentication",
+        )
+        return
 
     db = SessionLocal()
 

@@ -10,6 +10,14 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
+    
+    clerk_user_id = Column(
+        String(100),
+        unique=True,
+        nullable=True,
+        index=True,
+    )
+    
     name = Column(String(100), nullable=False)
     email = Column(String(150), unique=True, nullable=False)
     avatar = Column(String(10), default="R")
